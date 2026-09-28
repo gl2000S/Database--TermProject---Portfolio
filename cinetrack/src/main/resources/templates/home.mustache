@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineTrack</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body { height: 100%; overflow: hidden; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #111;
+            color: #eee;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ── NAV ─────────────────────────────────────────────── */
+        nav {
+            background: #1a1a1a;
+            border-bottom: 2px solid #e94560;
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            z-index: 100;
+        }
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e94560;
+            text-decoration: none;
+        }
+        nav .logo span { color: #fff; }
+        nav .nav-links { display: flex; align-items: center; gap: 24px; }
+        nav .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        nav .nav-links a:hover { color: #e94560; }
+        nav .nav-links .user-label { color: #888; }
+        .logout-btn {
+            background: none;
+            border: 1px solid #e94560;
+            color: #e94560;
+            padding: 5px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #e94560; color: #fff; }
+
+        /* ── SEARCH HERO ─────────────────────────────────────── */
+        .search-hero {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+            padding: 14px 40px;
+            text-align: center;
+            border-bottom: 1px solid #222;
+            flex-shrink: 0;
+        }
+        .search-hero h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 2px;
+            letter-spacing: -0.5px;
+        }
+        .search-hero h1 span { color: #e94560; }
+        .search-hero p { color: #777; font-size: 0.85rem; margin-bottom: 10px; }
+        .search-form {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            max-width: 580px;
+            margin: 0 auto;
+        }
+        .search-input {
+            flex: 1;
+            padding: 9px 18px;
+            background: #2a2a2a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #eee;
+            font-size: 0.97rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: #e94560; }
+        .search-input::placeholder { color: #555; }
+        .search-btn {
+            padding: 9px 26px;
+            background: #e94560;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.97rem;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+        .search-btn:hover { background: #c73652; }
+
+        /* ── PAGE CONTAINER ─────────────────────────────────── */
+        .container {
+            flex: 1;
+            min-height: 0;
+            display: grid;
+            grid-template-columns: 1fr 290px;
+            gap: 20px;
+            padding: 20px 20px 14px;
+            overflow: hidden;
+        }
+
+        /* ── SLIDER SECTION ─────────────────────────────────── */
+        .slider-section {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slider-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+        .slider-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #fff;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #e94560;
+            display: inline-block;
+        }
+        .clear-link {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.8rem;
+            border: 1px solid #333;
+            padding: 3px 10px;
+            border-radius: 4px;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        .clear-link:hover { color: #eee; border-color: #666; }
+
+        .load-more-btn {
+            background: none;
+            border: 1px solid #e94560;
+            color: #e94560;
+            padding: 7px 20px;
+            border-radius: 6px;
+            font-size: 0.83rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+        .load-more-btn:hover:not(:disabled) { background: #e94560; color: #fff; }
+        .load-more-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        /* ── SLIDER TRACK ───────────────────────────────────── */
+        .slider-track {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 6px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+            align-items: flex-start;
+        }
+        .slider-track::-webkit-scrollbar { height: 4px; }
+        .slider-track::-webkit-scrollbar-thumb {
+            background: #e94560;
+            border-radius: 2px;
+        }
+        .slider-track::-webkit-scrollbar-track { background: transparent; }
+
+        /* ── SHARED CARD BASE ───────────────────────────────── */
+        .slider-card {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #2a2a2a;
+            text-decoration: none;
+            color: inherit;
+            background: #1a1a1a;
+            flex-shrink: 0;
+            transition: transform 0.2s, border-color 0.2s;
+            display: block;
+        }
+        .slider-card:hover {
+            transform: translateY(-4px);
+            border-color: #e94560;
+        }
+
+        /* ── MOVIE CARD ─────────────────────────────────────── */
+        .movie-card { width: 148px; }
+        .slider-img {
+            width: 148px;
+            height: 222px;
+            object-fit: cover;
+            display: block;
+        }
+        .slider-placeholder {
+            width: 148px;
+            height: 222px;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 12px;
+            word-break: break-word;
+            white-space: normal;
+            line-height: 1.4;
+        }
+        .slider-card-info { padding: 8px 10px 10px; }
+        .slider-card-title {
+            font-size: 0.81rem;
+            font-weight: 600;
+            color: #eee;
+            margin-bottom: 5px;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 2.1em;
+        }
+        .slider-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .slider-year { font-size: 0.73rem; color: #777; }
+        .slider-rating { font-size: 0.73rem; color: #e94560; font-weight: 600; }
+
+        /* ── PERSON CARD ────────────────────────────────────── */
+        .person-card { width: 148px; text-align: center; }
+        .slider-person-img {
+            width: 148px;
+            height: 222px;
+            object-fit: cover;
+            object-position: top;
+            display: block;
+        }
+        .slider-person-placeholder {
+            width: 148px;
+            height: 222px;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ccc;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            padding: 12px;
+            word-break: break-word;
+            white-space: normal;
+            line-height: 1.4;
+        }
+        .slider-person-name {
+            padding: 6px 6px 8px;
+            font-size: 0.77rem;
+            font-weight: 600;
+            color: #ddd;
+            line-height: 1.3;
+        }
+
+        /* ── EMPTY STATE ────────────────────────────────────── */
+        .empty-state {
+            color: #555;
+            font-style: italic;
+            padding: 24px 0;
+            font-size: 0.9rem;
+        }
+
+        /* ── LAYOUT ─────────────────────────────────────────── */
+        .sliders-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* ── ACTIVITY FEED ──────────────────────────────────── */
+        .activity-col {
+            overflow-y: auto;
+            min-height: 0;
+            padding-right: 2px;
+        }
+        .activity-col::-webkit-scrollbar { width: 4px; }
+        .activity-col::-webkit-scrollbar-thumb { background: #e94560; border-radius: 2px; }
+        .activity-col::-webkit-scrollbar-track { background: transparent; }
+
+        .feed { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+        .feed-item {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-left: 3px solid #e94560;
+            border-radius: 8px;
+            padding: 12px 14px;
+        }
+        .feed-meta { font-size: 0.82rem; color: #888; margin-bottom: 6px; }
+        .feed-meta strong { color: #ddd; }
+        .feed-meta a { color: #e94560; text-decoration: none; }
+        .feed-meta a:hover { text-decoration: underline; }
+        .feed-rating {
+            display: inline-block;
+            background: #e94560;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 3px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+        .feed-body {
+            font-size: 0.85rem;
+            color: #aaa;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="/home" class="logo">Cine<span>Track</span></a>
+        <div class="nav-links">
+            {{#loggedInUsername}}
+                <a href="/watchlist">Watchlist</a>
+                <a href="/profile">My Profile</a>
+                <span class="user-label">{{loggedInUsername}}</span>
+                <form method="post" action="/logout" style="margin:0;">
+                    <button class="logout-btn" type="submit">Logout</button>
+                </form>
+            {{/loggedInUsername}}
+            {{^loggedInUsername}}
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            {{/loggedInUsername}}
+        </div>
+    </nav>
+
+    <!-- SEARCH HERO -->
+    <div class="search-hero">
+        <h1>Cine<span>Track</span></h1>
+        <p>Browse movies, directors, and actors — then leave your review.</p>
+        <form class="search-form" method="get" action="/home">
+            <input class="search-input" type="text" name="q"
+                   placeholder="Search movies by title..."
+                   {{#searchQuery}}value="{{searchQuery}}"{{/searchQuery}}>
+            <button class="search-btn" type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="container">
+    <div class="sliders-col">
+
+        <!-- ── MOVIES ─────────────────────────────────────────── -->
+        <div class="slider-section" id="movies">
+            <div class="slider-header">
+                <div class="slider-header-left">
+                    {{#searchQuery}}
+                        <h2 class="section-title">Results for "{{searchQuery}}"</h2>
+                        <a class="clear-link" href="/home">✕ Clear</a>
+                    {{/searchQuery}}
+                    {{^searchQuery}}
+                        <h2 class="section-title">Browse Movies</h2>
+                    {{/searchQuery}}
+                </div>
+                {{#hasMoreMovies}}
+                    <button class="load-more-btn" id="load-more-movies"
+                            onclick="loadMore('movies')">Load More</button>
+                {{/hasMoreMovies}}
+            </div>
+
+            <div class="slider-track" id="movies-track">
+                {{#movies}}
+                <a class="slider-card movie-card" href="/movies/{{movieId}}">
+                    {{#posterUrl}}
+                        <img class="slider-img" src="{{posterUrl}}" alt="{{title}}"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="slider-placeholder" style="display:none;">{{title}}</div>
+                    {{/posterUrl}}
+                    {{^posterUrl}}
+                        <div class="slider-placeholder">{{title}}</div>
+                    {{/posterUrl}}
+                    <div class="slider-card-info">
+                        <div class="slider-card-title">{{title}}</div>
+                        <div class="slider-card-meta">
+                            <span class="slider-year">
+                                {{#releaseYear}}{{releaseYear}}{{/releaseYear}}
+                                {{^releaseYear}}—{{/releaseYear}}
+                            </span>
+                            {{#avgRatingFormatted}}
+                                <span class="slider-rating">⭐ {{avgRatingFormatted}}</span>
+                            {{/avgRatingFormatted}}
+                        </div>
+                    </div>
+                </a>
+                {{/movies}}
+            </div>
+            {{^movies}}
+                <p class="empty-state">No movies found.</p>
+            {{/movies}}
+        </div>
+
+        <!-- ── DIRECTORS ──────────────────────────────────────── -->
+        <div class="slider-section" id="directors">
+            <div class="slider-header">
+                <div class="slider-header-left">
+                    <h2 class="section-title">Directors</h2>
+                </div>
+                {{#hasMoreDirectors}}
+                    <button class="load-more-btn" id="load-more-directors"
+                            onclick="loadMore('directors')">Load More</button>
+                {{/hasMoreDirectors}}
+            </div>
+
+            <div class="slider-track" id="directors-track">
+                {{#directors}}
+                <a class="slider-card person-card" href="/directors/{{directorId}}">
+                    {{#photoUrl}}
+                        <img class="slider-person-img" src="{{photoUrl}}" alt="{{name}}"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="slider-person-placeholder" style="display:none;">{{name}}</div>
+                    {{/photoUrl}}
+                    {{^photoUrl}}
+                        <div class="slider-person-placeholder">{{name}}</div>
+                    {{/photoUrl}}
+                    <div class="slider-person-name">{{name}}</div>
+                </a>
+                {{/directors}}
+            </div>
+            {{^directors}}
+                <p class="empty-state">No directors found.</p>
+            {{/directors}}
+        </div>
+
+        <!-- ── ACTORS ─────────────────────────────────────────── -->
+        <div class="slider-section" id="actors">
+            <div class="slider-header">
+                <div class="slider-header-left">
+                    <h2 class="section-title">Actors</h2>
+                </div>
+                {{#hasMoreActors}}
+                    <button class="load-more-btn" id="load-more-actors"
+                            onclick="loadMore('actors')">Load More</button>
+                {{/hasMoreActors}}
+            </div>
+
+            <div class="slider-track" id="actors-track">
+                {{#actors}}
+                <a class="slider-card person-card" href="/actors/{{actorId}}">
+                    {{#photoUrl}}
+                        <img class="slider-person-img" src="{{photoUrl}}" alt="{{name}}"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+                        <div class="slider-person-placeholder" style="display:none;">{{name}}</div>
+                    {{/photoUrl}}
+                    {{^photoUrl}}
+                        <div class="slider-person-placeholder">{{name}}</div>
+                    {{/photoUrl}}
+                    <div class="slider-person-name">{{name}}</div>
+                </a>
+                {{/actors}}
+            </div>
+            {{^actors}}
+                <p class="empty-state">No actors found.</p>
+            {{/actors}}
+        </div>
+
+    </div><!-- end .sliders-col -->
+
+    <!-- ── RECENT ACTIVITY ────────────────────────────────── -->
+    <div class="activity-col">
+        <h2 class="section-title">Recent Activity</h2>
+        <div class="feed">
+            {{#recentActivity}}
+            <div class="feed-item">
+                <div class="feed-meta">
+                    <strong>{{username}}</strong> reviewed
+                    <a href="/movies/{{movieId}}">{{movieTitle}}</a>
+                </div>
+                <div class="feed-body">
+                    <span class="feed-rating">{{rating}}/10</span>
+                    {{#body}}{{body}}{{/body}}
+                    {{^body}}<em style="color:#555">No review text</em>{{/body}}
+                </div>
+            </div>
+            {{/recentActivity}}
+            {{^recentActivity}}
+            <p class="empty-state">No reviews yet.</p>
+            {{/recentActivity}}
+        </div>
+    </div>
+
+    </div><!-- end .container -->
+
+    <script>
+        const PAGE_SIZE = 20;
+
+        // Initialized from server-rendered counts so offsets stay accurate
+        const offsets = {
+            movies:    {{movieCount}},
+            directors: {{directorCount}},
+            actors:    {{actorCount}}
+        };
+
+        async function loadMore(section) {
+            const btn   = document.getElementById('load-more-' + section);
+            const track = document.getElementById(section + '-track');
+
+            btn.disabled    = true;
+            btn.textContent = 'Loading…';
+
+            const q   = new URLSearchParams(window.location.search).get('q') || '';
+            let   url = '/browse/' + section + '?offset=' + offsets[section] + '&limit=' + PAGE_SIZE;
+            if (section === 'movies' && q) url += '&q=' + encodeURIComponent(q);
+
+            try {
+                const resp  = await fetch(url);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const items = await resp.json();
+
+                items.forEach(item => track.appendChild(buildCard(section, item)));
+                offsets[section] += items.length;
+
+                if (items.length < PAGE_SIZE) {
+                    btn.style.display = 'none';
+                } else {
+                    btn.disabled    = false;
+                    btn.textContent = 'Load More';
+                }
+            } catch (err) {
+                console.error('loadMore error:', err);
+                btn.disabled    = false;
+                btn.textContent = 'Load More';
+            }
+        }
+
+        function buildCard(section, item) {
+            const a = document.createElement('a');
+            a.className = 'slider-card';
+
+            if (section === 'movies') {
+                a.href      = '/movies/' + item.movieId;
+                a.className += ' movie-card';
+
+                // poster
+                if (item.posterUrl) {
+                    const img = document.createElement('img');
+                    img.className = 'slider-img';
+                    img.src       = item.posterUrl;
+                    img.alt       = item.title || '';
+                    img.onerror   = () => img.parentNode.replaceChild(noPostImg(item.title), img);
+                    a.appendChild(img);
+                } else {
+                    a.appendChild(noPostImg(item.title));
+                }
+
+                // info block
+                const info  = document.createElement('div');
+                info.className = 'slider-card-info';
+
+                const title = document.createElement('div');
+                title.className   = 'slider-card-title';
+                title.textContent = item.title || '';
+
+                const meta  = document.createElement('div');
+                meta.className = 'slider-card-meta';
+
+                const yr = document.createElement('span');
+                yr.className   = 'slider-year';
+                yr.textContent = item.releaseYear || '—';
+                meta.appendChild(yr);
+
+                if (item.avgRatingFormatted) {
+                    const rt = document.createElement('span');
+                    rt.className   = 'slider-rating';
+                    rt.textContent = '⭐ ' + item.avgRatingFormatted;
+                    meta.appendChild(rt);
+                }
+
+                info.appendChild(title);
+                info.appendChild(meta);
+                a.appendChild(info);
+
+            } else {
+                // directors or actors
+                const id = section === 'directors' ? item.directorId : item.actorId;
+                a.href      = '/' + section + '/' + id;
+                a.className += ' person-card';
+
+                if (item.photoUrl) {
+                    const img = document.createElement('img');
+                    img.className = 'slider-person-img';
+                    img.src       = item.photoUrl;
+                    img.alt       = item.name || '';
+                    img.onerror   = () => img.parentNode.replaceChild(noPhotoImg(item.name), img);
+                    a.appendChild(img);
+                } else {
+                    a.appendChild(noPhotoImg(item.name));
+                }
+
+                const name = document.createElement('div');
+                name.className   = 'slider-person-name';
+                name.textContent = item.name || '';
+                a.appendChild(name);
+            }
+
+            return a;
+        }
+
+        function noPostImg(title) {
+            const d = document.createElement('div');
+            d.className   = 'slider-placeholder';
+            d.textContent = title || '';
+            return d;
+        }
+
+        function noPhotoImg(name) {
+            const d = document.createElement('div');
+            d.className   = 'slider-person-placeholder';
+            d.textContent = name || '';
+            return d;
+        }
+
+        // Convert vertical wheel scroll into horizontal scroll on each slider track
+        document.querySelectorAll('.slider-track').forEach(track => {
+            track.addEventListener('wheel', e => {
+                if (e.deltaY === 0) return;
+                e.preventDefault();
+                track.scrollLeft += e.deltaY;
+            }, { passive: false });
+        });
+    </script>
+</body>
+</html>

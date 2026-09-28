@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{#director}}{{name}} — {{/director}}CineTrack</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #111;
+            color: #eee;
+            min-height: 100vh;
+        }
+
+        /* NAV */
+        nav {
+            background: #1a1a1a;
+            border-bottom: 2px solid #e94560;
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e94560;
+            text-decoration: none;
+        }
+        nav .nav-links { display: flex; align-items: center; gap: 24px; }
+        nav .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        nav .nav-links a:hover { color: #e94560; }
+        nav .nav-links span { color: #666; }
+        .logout-btn {
+            background: none;
+            border: 1px solid #e94560;
+            color: #e94560;
+            padding: 5px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #e94560; color: #fff; }
+
+        /* MAIN LAYOUT */
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; }
+
+        /* ERROR */
+        .error-msg {
+            background: #2a1a1a;
+            border: 1px solid #e94560;
+            color: #e94560;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        /* PROFILE HEADER */
+        .profile-header {
+            display: flex;
+            gap: 36px;
+            align-items: flex-start;
+            margin-bottom: 48px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 32px;
+            border: 1px solid #2a2a2a;
+        }
+        .profile-photo {
+            width: 180px;
+            height: 270px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+            border: 2px solid #2a2a2a;
+        }
+        .profile-photo-placeholder {
+            width: 180px;
+            height: 270px;
+            background: #2a2a2a;
+            border-radius: 8px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 0.85rem;
+        }
+        .profile-info { flex: 1; }
+        .profile-info h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+        .profile-info .birthdate {
+            color: #aaa;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+        }
+        .profile-info .bio {
+            color: #ccc;
+            line-height: 1.7;
+            font-size: 0.97rem;
+            max-width: 640px;
+        }
+
+        /* FILMOGRAPHY SECTION */
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e94560;
+            display: inline-block;
+        }
+        .film-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 20px;
+        }
+        .film-card {
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #2a2a2a;
+            transition: transform 0.2s, border-color 0.2s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .film-card:hover {
+            transform: translateY(-4px);
+            border-color: #e94560;
+        }
+        .film-poster {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            display: block;
+        }
+        .film-poster-placeholder {
+            width: 100%;
+            aspect-ratio: 2/3;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 0.8rem;
+        }
+        .film-info { padding: 10px 12px 14px; }
+        .film-title {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #eee;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+        .film-year {
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .film-rating {
+            font-size: 0.78rem;
+            color: #f5c518;
+        }
+        .no-films {
+            color: #666;
+            font-style: italic;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/home" class="logo">CineTrack</a>
+        <div class="nav-links">
+            <a href="/home">Home</a>
+            <a href="/search">Search</a>
+            <a href="/watchlist">Watchlist</a>
+            {{#loggedInUsername}}
+                <span>{{loggedInUsername}}</span>
+                <form method="post" action="/logout" style="margin:0;">
+                    <button class="logout-btn" type="submit">Logout</button>
+                </form>
+            {{/loggedInUsername}}
+            {{^loggedInUsername}}
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            {{/loggedInUsername}}
+        </div>
+    </nav>
+
+    <div class="container">
+
+        {{#error}}
+            <div class="error-msg">{{error}}</div>
+        {{/error}}
+
+        {{#director}}
+            <div class="profile-header">
+                {{#photoUrl}}
+                    <img class="profile-photo" src="{{photoUrl}}" alt="{{name}}">
+                {{/photoUrl}}
+                {{^photoUrl}}
+                    <div class="profile-photo-placeholder">No Photo</div>
+                {{/photoUrl}}
+
+                <div class="profile-info">
+                    <h1>{{name}}</h1>
+                    <p class="birthdate">
+                        {{#birthdate}}Born: {{birthdate}}{{/birthdate}}
+                        {{^birthdate}}Born: Unknown{{/birthdate}}
+                    </p>
+                    <p class="bio">
+                        {{#bio}}{{bio}}{{/bio}}
+                        {{^bio}}No biography available.{{/bio}}
+                    </p>
+                </div>
+            </div>
+
+            <div>
+                <h2 class="section-title">Filmography</h2>
+                <div class="film-grid">
+                    {{#filmography}}
+                        <a class="film-card" href="/movies/{{movieId}}">
+                            {{#posterUrl}}
+                                <img class="film-poster" src="{{posterUrl}}" alt="{{title}}">
+                            {{/posterUrl}}
+                            {{^posterUrl}}
+                                <div class="film-poster-placeholder">No Poster</div>
+                            {{/posterUrl}}
+                            <div class="film-info">
+                                <div class="film-title">{{title}}</div>
+                                <div class="film-year">
+                                    {{#releaseYear}}{{releaseYear}}{{/releaseYear}}
+                                    {{^releaseYear}}N/A{{/releaseYear}}
+                                </div>
+                                {{#avgRating}}
+                                    <div class="film-rating">★ {{avgRating}}</div>
+                                {{/avgRating}}
+                                {{^avgRating}}
+                                    <div class="film-rating" style="color:#555;">No ratings yet</div>
+                                {{/avgRating}}
+                            </div>
+                        </a>
+                    {{/filmography}}
+                </div>
+                {{^filmography}}
+                    <p class="no-films">No films found.</p>
+                {{/filmography}}
+            </div>
+        {{/director}}
+
+    </div>
+</body>
+</html>

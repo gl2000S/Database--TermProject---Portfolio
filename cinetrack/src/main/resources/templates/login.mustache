@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CineTrack</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #111;
+            color: #eee;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background: #1a1a1a;
+            border-bottom: 2px solid #e94560;
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e94560;
+            text-decoration: none;
+        }
+        nav .logo span { color: #fff; }
+        nav .nav-links { display: flex; align-items: center; gap: 24px; }
+        nav .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        nav .nav-links a:hover { color: #e94560; }
+
+        .page-center {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .auth-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 40px 44px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .auth-card h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #fff;
+        }
+        .auth-card h1 span { color: #e94560; }
+        .auth-card .subtitle {
+            color: #777;
+            font-size: 0.88rem;
+            margin-bottom: 28px;
+        }
+
+        .alert {
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+        }
+        .alert-success { background: #1a3a2a; border: 1px solid #2d6a4a; color: #6fcf97; }
+        .alert-error   { background: #3a1a1a; border: 1px solid #6a2d2d; color: #eb5757; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            background: #2a2a2a;
+            border: 2px solid #333;
+            border-radius: 8px;
+            color: #eee;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus { border-color: #e94560; }
+        .form-group input::placeholder { color: #555; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 11px;
+            background: #e94560;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 6px;
+        }
+        .submit-btn:hover { background: #c73652; }
+
+        .auth-footer {
+            text-align: center;
+            margin-top: 22px;
+            font-size: 0.88rem;
+            color: #666;
+        }
+        .auth-footer a { color: #e94560; text-decoration: none; }
+        .auth-footer a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/home" class="logo">Cine<span>Track</span></a>
+        <div class="nav-links">
+            <a href="/home">Home</a>
+            <a href="/signup">Sign Up</a>
+        </div>
+    </nav>
+
+    <div class="page-center">
+        <div class="auth-card">
+            <h1>Welcome <span>Back</span></h1>
+            <p class="subtitle">Sign in to your CineTrack account</p>
+
+            {{#success}}
+                <div class="alert alert-success">{{success}}</div>
+            {{/success}}
+
+            {{#error}}
+                <div class="alert alert-error">{{error}}</div>
+            {{/error}}
+
+            <form method="post" action="/login">
+                <div class="form-group">
+                    <label for="usernameOrEmail">Username or Email</label>
+                    <input id="usernameOrEmail" type="text" name="usernameOrEmail"
+                           placeholder="Enter your username or email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" name="password"
+                           placeholder="Enter your password" required>
+                </div>
+
+                <button class="submit-btn" type="submit">Login</button>
+            </form>
+
+            <div class="auth-footer">
+                Don't have an account? <a href="/signup">Sign up</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

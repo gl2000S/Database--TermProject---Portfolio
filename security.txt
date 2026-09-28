@@ -1,0 +1,13 @@
+CineTrack(Security Implementation):
+
+- User authentication in this project is implemented securely.
+
+- Passwords are not stored in plain text. During signup, passwords are hashed using BCrypt before being saved in the database.
+
+- During login, the entered password is compared with the stored hashed password using BCrypt.
+
+- All SQL queries use prepared statements to prevent SQL injection.
+
+- A session is created after login to keep the user authenticated, and it is cleared when the user logs out.
+
+- These measures help protect user data and ensure secure authentication.

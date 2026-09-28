@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - CineTrack</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #111;
+            color: #eee;
+            min-height: 100vh;
+        }
+
+        /* ── NAV ─────────────────────────────────────────────── */
+        nav {
+            background: #1a1a1a;
+            border-bottom: 2px solid #e94560;
+            padding: 14px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        nav .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #e94560;
+            text-decoration: none;
+        }
+        nav .logo span { color: #fff; }
+        nav .nav-links { display: flex; align-items: center; gap: 24px; }
+        nav .nav-links a {
+            color: #ccc;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+        nav .nav-links a:hover { color: #e94560; }
+        nav .nav-links .user-label { color: #888; font-size: 0.9rem; }
+        .logout-btn {
+            background: none;
+            border: 1px solid #e94560;
+            color: #e94560;
+            padding: 5px 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        .logout-btn:hover { background: #e94560; color: #fff; }
+
+        /* ── PAGE ────────────────────────────────────────────── */
+        .container {
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 36px 24px;
+        }
+
+        .error-msg {
+            background: #3a1a1a;
+            border: 1px solid #6a2d2d;
+            color: #eb5757;
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+
+        /* ── PROFILE HEADER ──────────────────────────────────── */
+        .profile-header {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: flex-start;
+            gap: 28px;
+        }
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #2a2a2a;
+            border: 2px solid #e94560;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e94560;
+            flex-shrink: 0;
+        }
+        .profile-info { flex: 1; }
+        .profile-name {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .own-profile-badge {
+            display: inline-block;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #e94560;
+            border: 1px solid #e94560;
+            border-radius: 4px;
+            padding: 2px 8px;
+            margin-bottom: 10px;
+        }
+        .profile-meta {
+            font-size: 0.88rem;
+            color: #777;
+            margin-bottom: 10px;
+        }
+        .profile-meta span { margin-right: 18px; }
+        .profile-bio {
+            font-size: 0.92rem;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* ── STATS ───────────────────────────────────────────── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            transition: border-color 0.2s;
+        }
+        .stat-card:hover { border-color: #e94560; }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #e94560;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+        .stat-label {
+            font-size: 0.82rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ── SECTION TITLE ───────────────────────────────────── */
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e94560;
+            display: inline-block;
+            margin-bottom: 18px;
+        }
+
+        /* ── REVIEW CARDS ────────────────────────────────────── */
+        .review-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin-bottom: 14px;
+            transition: border-color 0.2s;
+        }
+        .review-card:hover { border-color: #333; }
+        .review-movie-link {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #eee;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .review-movie-link:hover { color: #e94560; }
+        .review-rating {
+            font-size: 0.85rem;
+            color: #e94560;
+            font-weight: 600;
+            margin: 6px 0;
+        }
+        .review-body {
+            font-size: 0.9rem;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        .review-date {
+            font-size: 0.78rem;
+            color: #555;
+            font-style: italic;
+        }
+
+        .empty-state {
+            color: #555;
+            font-style: italic;
+            font-size: 0.9rem;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/home" class="logo">Cine<span>Track</span></a>
+        <div class="nav-links">
+            <a href="/home">Home</a>
+            <a href="/search">Search</a>
+            {{#loggedInUsername}}
+                <a href="/watchlist">Watchlist</a>
+                <a href="/profile">My Profile</a>
+                <span class="user-label">{{loggedInUsername}}</span>
+                <form method="post" action="/logout" style="margin:0;">
+                    <button class="logout-btn" type="submit">Logout</button>
+                </form>
+            {{/loggedInUsername}}
+            {{^loggedInUsername}}
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            {{/loggedInUsername}}
+        </div>
+    </nav>
+
+    <div class="container">
+
+        {{#error}}
+            <div class="error-msg">{{error}}</div>
+        {{/error}}
+
+        {{#profileUser}}
+
+            <div class="profile-header">
+                <div class="profile-avatar">{{profileUser.username}}</div>
+                <div class="profile-info">
+                    <div class="profile-name">{{profileUser.username}}</div>
+                    {{#isOwnProfile}}
+                        <span class="own-profile-badge">Your Profile</span>
+                    {{/isOwnProfile}}
+                    <div class="profile-meta">
+                        <span>{{profileUser.email}}</span>
+                        <span>Joined {{profileUser.createdAt}}</span>
+                    </div>
+                    <div class="profile-bio">
+                        {{#profileUser.bio}}{{profileUser.bio}}{{/profileUser.bio}}
+                        {{^profileUser.bio}}No bio added yet.{{/profileUser.bio}}
+                    </div>
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">{{stats.reviewCount}}</div>
+                    <div class="stat-label">Reviews</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{stats.followerCount}}</div>
+                    <div class="stat-label">Followers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">{{stats.followingCount}}</div>
+                    <div class="stat-label">Following</div>
+                </div>
+            </div>
+
+            <h2 class="section-title">Recent Reviews</h2>
+
+            {{#recentReviews}}
+                <div class="review-card">
+                    <a class="review-movie-link" href="/movies/{{movieId}}">{{movieTitle}}</a>
+                    <div class="review-rating">&#11088; {{rating}}/10</div>
+                    <div class="review-body">{{body}}</div>
+                    <div class="review-date">{{createdAt}}</div>
+                </div>
+            {{/recentReviews}}
+
+            {{^recentReviews}}
+                <p class="empty-state">No reviews yet.</p>
+            {{/recentReviews}}
+
+        {{/profileUser}}
+
+    </div>
+
+</body>
+</html>
